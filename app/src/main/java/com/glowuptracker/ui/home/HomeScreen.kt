@@ -1,117 +1,103 @@
-package com.sofiia.glowuptracker.ui.home
+package com.glowuptracker.ui.home
 
+import HabitViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-//import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
-data class FakeHabit(
-    val id: Int,
-    val name: String,
-    val icon: String,
-    var completed: Boolean
-)
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onAddClick: () -> Unit = {}
+    habitViewModel: HabitViewModel
 ) {
 
-    val habits = remember {
-        mutableStateListOf(
-            FakeHabit(1, "Workout", "🏋️", false),
-            FakeHabit(2, "Drink Water", "💧", false),
-            FakeHabit(3, "Read Book", "📖", false),
-            FakeHabit(4, "Code Practice", "💻", false)
-        )
-    }
-
-    val streak = if (habits.all { it.completed }) 5 else 0
-    val weeklyProgress = habits.count { it.completed } / habits.size.toFloat()
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Default.Add, contentDescription = "Add Habit")
-            }
-        }
-    ) { padding ->
+    val habits = habitViewModel.habits
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFEDE7F6),
-                            Color(0xFFD1C4E9)
-                        )
-                    )
-                )
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .background(Color(0xFFFFB6C1))
         ) {
 
+            // 🔥 Header
             item {
-                Column {
-                    Text(
-                        text = "Hello, User ✨",
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Ready to glow today?",
-                        fontSize = 16.sp,
-                        color = Color.DarkGray
-                    )
-                }
-            }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .clip(
+                            RoundedCornerShape(
+                                bottomEnd = 25.dp,
+                                bottomStart = 25.dp
+                            )
+                        )
+                        .background(
+                            Brush.linearGradient(
+                                listOf(
+                                    Color(0xFF511C93),
+                                    Color(0xFFFF7DFD),
+                                    Color(0xFFDBFFB6)
 
-            item {
-                Card(
-                    shape = MaterialTheme.shapes.large
+                                )
+                            )
+                        )
+                        .padding(24.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Believe in yourself.",
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Small daily actions build unstoppable discipline."
-                        )
-                    }
+                    Text(
+                        "Glow Up Tracker",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        "Hello, User!",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+
+                    Text(
+                        "Ready to become your best self?",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
                 }
             }
-
-            items(habits) { habit ->
-
+            item{Spacer(modifier = Modifier.height(24.dp))}
+            // 🔥 Fake Tasks
+            items(
+                listOf(
+                    "Wake up before 8 AM ☀️",
+                    "Drink 2L of water 💧",
+                    "30 min workout 🏋️",
+                    "Read 10 pages 📖"
+                )
+            ) { task ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            habit.completed = !habit.completed
-                        },
-                    shape = MaterialTheme.shapes.large
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -122,21 +108,53 @@ fun HomeScreen(
                     ) {
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = habit.icon,
-                                fontSize = 22.sp
+                            Icon(
+                                Icons.Rounded.CheckCircle,
+                                contentDescription = null,
+                                tint = Color.LightGray
                             )
+
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = habit.name,
-                                fontSize = 18.sp
-                            )
+
+                            Text(task, fontSize = 16.sp)
                         }
 
+                        Icon(
+                            Icons.Filled.Done,
+                            contentDescription = null,
+                            tint = Color.Gray
+                        )
+                    }
+                }
+            }
+
+            // 🔥 Real Habits
+            items(habits) { habit ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                        .clickable {
+                            habitViewModel.toggleHabit(habit.id)
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(
+                            text = habit.name,
+                            fontSize = 18.sp
+                        )
+
                         Checkbox(
-                            checked = habit.completed,
+                            checked = habit.completedToday,
                             onCheckedChange = {
-                                habit.completed = it
+                                habitViewModel.toggleHabit(habit.id)
                             }
                         )
                     }
@@ -145,41 +163,39 @@ fun HomeScreen(
 
             item {
                 Card(
-                    shape = MaterialTheme.shapes.large
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .padding(16.dp)
+                            .fillMaxWidth()
                     ) {
+                        Text("Belive in yourself")
+                        Text("You are stronger then you think! \uD83D\uDD25")
+                    }
+                }
+            }
 
+            // 🔥 Weekly Progress
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
                         Text(
-                            text = "Weekly Progress",
+                            "Weekly Progress",
                             fontWeight = FontWeight.SemiBold
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        LinearProgressIndicator(
-                            progress = weeklyProgress,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = null,
-                                tint = Color.Red
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Streak: $streak days"
-                            )
-                        }
+                        Text("Streak: 0 days")
                     }
                 }
             }
@@ -188,5 +204,4 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(80.dp))
             }
         }
-    }
 }
