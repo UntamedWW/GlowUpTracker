@@ -1,6 +1,5 @@
 package com.glowuptracker.ui.addhabit
 
-import HabitViewModel
 import android.icu.util.Calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,12 +33,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.glowuptracker.viewmodel.HomeViewModel
 
 
 @Composable
 fun AddHabitScreen(
-    habitViewModel: HabitViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    homeViewModel: HomeViewModel
 ){
     Column(modifier = Modifier
         .fillMaxSize()
@@ -128,6 +128,20 @@ fun AddHabitScreen(
                         showPicker = false
                     }
                 )
+            }
+
+            Button(
+                onClick = {
+
+                    homeViewModel.addHabit(
+                        title = habitName,
+                        reminderTime = time
+                    )
+
+                    navController.popBackStack()
+                }
+            ) {
+                Text("Save")
             }
         }
     }
