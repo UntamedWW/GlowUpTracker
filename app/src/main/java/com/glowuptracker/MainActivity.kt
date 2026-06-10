@@ -1,10 +1,10 @@
 package com.glowuptracker
 
-import HabitViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,7 +20,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.glowuptracker.ui.addhabit.AddHabitScreen
-import com.glowuptracker.ui.home.HomeScreen
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.NavHost
+import com.glowuptracker.viewmodel.HomeViewModel
+import com.glowuptracker.navigation.NavGraph
 
 
 class MainActivity : ComponentActivity() {
@@ -42,7 +39,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val navController = rememberNavController()
-            val habitViewModel: HabitViewModel = viewModel()
+            val homeViewModel: HomeViewModel = viewModel()
 
             Scaffold(
                 bottomBar = {
@@ -54,32 +51,21 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("add_habit")
                         }
                     ) {
-                        Icon(Icons.Sharp.Edit, contentDescription = null)
+                        Icon(
+                            Icons.Sharp.Edit,
+                            contentDescription = null
+                        )
                     }
                 }
             ) { padding ->
 
-                NavHost(
-                    navController = navController,
-                    startDestination = "home",
+                Box(
                     modifier = Modifier.padding(padding)
                 ) {
-
-                    composable("home") {
-                        HomeScreen(habitViewModel)
-                    }
-
-                    composable("add_habit") {
-                        AddHabitScreen(habitViewModel, navController)
-                    }
-
-                    composable("stats") {
-                        Text("Stats Screen")
-                    }
-
-                    composable("profile") {
-                        Text("Profile Screen")
-                    }
+                    NavGraph(
+                        navController = navController,
+                        homeViewModel = homeViewModel
+                    )
                 }
             }
         }
